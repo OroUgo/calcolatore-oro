@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Oro 0.800</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #121212; color: #e0e0e0; }
+        .card { background: #1e1e1e; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; margin: auto; border: 1px solid #333; }
+        h2 { color: #ffd700; text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        label { font-size: 0.85em; color: #aaa; font-weight: bold; }
+        input { width: 100%; padding: 12px; margin: 8px 0 18px 0; border: 1px solid #444; border-radius: 8px; background: #252525; color: #fff; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #ffd700; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
+        .btn-ws { background: #25d366; color: white; }
+        .res-container { margin-top: 20px; padding: 15px; background: #252525; border-radius: 8px; border-left: 5px solid #ffd700; display: none; }
+        .price-line { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.95em; }
+        .total { font-size: 1.3em; color: #ffd700; font-weight: bold; border-top: 1px solid #444; padding-top: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Preventivo Oro</h2>
+    
+    <label>Prezzo Oro Puro (€/g)</label>
+    <input type="number" id="prezzoOro" step="0.01" placeholder="es. 70.00">
+    
+    <label>Peso Oggetto (g)</label>
+    <input type="number" id="peso" step="0.01" placeholder="es. 10">
+    
+    <label>Manifattura (€)</label>
+    <input type="number" id="manifattura" step="0.01" placeholder="es. 50">
+    
+    <label>Ricarico Finale (%)</label>
+    <input type="number" id="ricarico" value="20">
+
+    <button onclick="calcola()">CALCOLA PREZZO</button>
+    
+    <div id="risultato" class="res-container">
+        <div class="price-line"><span>Oro (Valore 0.800):</span> <span id="v-oro"></span></div>
+        <div class="price-line"><span>Manifattura:</span> <span id="v-mani"></span></div>
+        <div class="price-line"><span>IVA (22%):</span> <span id="v-iva"></span></div>
+        <div class="price-line total"><span>Prezzo Finale:</span> <span id="v-tot"></span></div>
+        
+        <button class="btn-ws" onclick="inviaWhatsApp()">INVIA SU WHATSAPP</button>
+    </div>
+</div>
+
+<script>
+let globalTotal = 0;
+
+function calcola() {
+    const oroPuro = parseFloat(document.getElementById('prezzoOro').value) || 0;
+    const peso = parseFloat(document.getElementById('peso').value) || 0;
+    const mani = parseFloat(document.getElementById('manifattura').value) || 0;
+    const ricaricoPerc = parseFloat(document.getElementById('ricarico').value) || 0;
+
+    // 1. Prezzo oro puro x 0.800 x peso
+    const valoreOroLavorato = (oroPuro * 0.800) * peso;
+    
+    // 2. Aggiunta manifattura
+    const imponibileBase = valoreOroLavorato + mani;
+    
+    // 3. Aggiunta IVA (22%)
+    const prezzoConIva = imponibileBase * 1.22;
+    
+    // 4. Aggiunta Ricarico
+    globalTotal = prezzoConIva + (prezzoConIva * (ricaricoPerc / 100));
+
+    // Visualizzazione
+    document.getElementById('v-oro').innerText = "€ " + valoreOroLavorato.toFixed(2);
+    document.getElementById('v-mani').innerText = "€ " + mani.toFixed(2);
+    document.getElementById('v-iva').innerText = "€ " + (prezzoConIva - imponibileBase).toFixed(2);
+    document.getElementById('v-tot').innerText = "€ " + globalTotal.toFixed(2);
+    document.getElementById('risultato').style.display = "block";
+}
+
+function inviaWhatsApp() {
+    const testo = `Preventivo Gioiello:%0A- Oro (valore 0.800): €${document.getElementById('v-oro').innerText}%0A- Totale al Pubblico: *${document.getElementById('v-tot').innerText}*`;
+    window.open(`https://wa.me/?text=${testo}`, '_blank');
+}
+</script>
+
+</body>
+</html>
