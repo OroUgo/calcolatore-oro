@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calcolatore Oro v3.0</title>
+    <style>
+        :root { --gold: #d4af37; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 380px; border: 1px solid #333; }
+        h2 { color: var(--gold); text-align: center; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: #888; font-weight: 600; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #444; border-radius: 10px; background: #2a2a2a; color: #fff; font-size: 16px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--gold); }
+        button { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .results { margin-top: 20px; padding: 15px; background: #252525; border-radius: 10px; display: none; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .total-row { border-top: 1px solid #444; margin-top: 10px; padding-top: 10px; font-weight: bold; font-size: 1.3rem; color: var(--gold); }
+        .hint { font-size: 0.7rem; color: #666; margin-top: -12px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Listino Oro v3.0</h2>
+    
+    <label>Prezzo Oro Puro (€/g)</label>
+    <input type="number" id="oroPuro" step="0.01" placeholder="es. 75.50">
+    
+    <label>Peso Oggetto (g)</label>
+    <input type="number" id="peso" step="0.01" placeholder="es. 10.00">
+    
+    <label>Manifattura (€ al grammo)</label>
+    <input type="number" id="manifattura" step="0.1" placeholder="es. 8.00">
+    <div class="hint">Verrà moltiplicata per il peso</div>
+    
+    <label>Ricarico (%)</label>
+    <input type="number" id="ricarico" value="20">
+    
+    <label>IVA (%)</label>
+    <input type="number" id="iva" value="22">
+
+    <button onclick="calcola()">CALCOLA PREZZO FINALE</button>
+
+    <div id="risultato" class="results">
+        <div class="row"><span>Prezzo Oro (0.800):</span> <span id="r-oro"></span></div>
+        <div class="row"><span>Manifattura Totale:</span> <span id="r-mani"></span></div>
+        <div class="row"><span>Imponibile + Ric:</span> <span id="r-imp"></span></div>
+        <div class="row"><span>IVA:</span> <span id="r-iva"></span></div>
+        <div class="row total-row"><span>TOTALE:</span> <span id="r-tot"></span></div>
+    </div>
+</div>
+
+<script>
+function calcola() {
+    const oro = parseFloat(document.getElementById('oroPuro').value) || 0;
+    const peso = parseFloat(document.getElementById('peso').value) || 0;
+    const maniGrammo = parseFloat(document.getElementById('manifattura').value) || 0;
+    const ric = parseFloat(document.getElementById('ricarico').value) || 0;
+    const iva = parseFloat(document.getElementById('iva').value) || 0;
+
+    // 1. Calcolo componenti base
+    const valoreOroAlGrammo = oro * 0.800;
+    const costoMateriaPrimaTotale = valoreOroAlGrammo * peso;
+    const manifatturaTotale = maniGrammo * peso;
+    
+    // 2. Calcolo Imponibile
+    const costoProduzione = costoMateriaPrimaTotale + manifatturaTotale;
+    const imponibileConRicarico = costoProduzione * (1 + (ric / 100));
+    
+    // 3. Calcolo Finale con IVA
+    const valoreIva = imponibileConRicarico * (iva / 100);
+    const finale = imponibileConRicarico + valoreIva;
+
+    // Visualizzazione
+    document.getElementById('r-oro').innerText = "€ " + costoMateriaPrimaTotale.toFixed(2);
+    document.getElementById('r-mani').innerText = "€ " + manifatturaTotale.toFixed(2);
+    document.getElementById('r-imp').innerText = "€ " + imponibileConRicarico.toFixed(2);
+    document.getElementById('r-iva').innerText = "€ " + valoreIva.toFixed(2);
+    document.getElementById('r-tot').innerText = "€ " + finale.toFixed(2);
+    document.getElementById('risultato').style.display = "block";
+}
+</script>
+
+</body>
+</html>
